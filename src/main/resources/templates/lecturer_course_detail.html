@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Eazy School - Course Materials</title>
+    <link href="//fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style-starter.css">
+    <style>
+        .upload-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .material-card {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .material-info h5 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+        .material-info small {
+            color: #6c757d;
+        }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+    </style>
+</head>
+
+<body>
+
+<div th:replace="~{header :: header}">...</div>
+
+<section class="inner-banner py-5">
+    <div class="w3l-breadcrumb py-lg-5">
+        <div class="container pt-4 pb-sm-4">
+            <h4 class="inner-text-title pt-5" th:text="${course.name}">Course Name</h4>
+            <ul class="breadcrumbs-custom-path">
+                <li><a th:href="@{/dashboard}">Dashboard</a></li>
+                <li><a th:href="@{/lecturer/displayCourses}">Kurset e Mia</a></li>
+                <li class="active"><i class="fas fa-angle-right"></i>Materialet</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<div class="site-section">
+    <div class="container">
+        <!-- Error/Success Messages -->
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+        <!-- Upload Section -->
+        <div class="upload-info">
+            <h4>Ngarko Material te Ri</h4>
+            <p>
+                <strong>Rregullat:</strong> Vetem dokumenta PDF, maksimumi 10MB per dokument.
+                <br/>
+                <span th:text="'Dokumenta te ngarkuara: ' + ${materialCount} + '/' + ${maxMaterials}"></span>
+            </p>
+
+            <form th:if="${canUpload}" th:action="@{/lecturer/uploadMaterial}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="courseId" th:value="${course.courseId}"/>
+                <div class="row align-items-end">
+                    <div class="col-md-8">
+                        <label for="file" class="form-label">Zgjidh Dokumentin (PDF, max 10MB)</label>
+                        <input type="file" class="form-control" id="file" name="file" accept=".pdf,application/pdf" required/>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-style btn-style-3">NGARKO</button>
+                    </div>
+                </div>
+            </form>
+
+            <div th:if="${!canUpload}" class="alert alert-warning mt-3">
+                Keni arritur numrin maksimal te dokumenteve per kete kurs (8 dokumenta).
+                Fshini nje dokument per te ngarkuar te ri.
+            </div>
+        </div>
+
+        <!-- Materials List -->
+        <h4 class="mb-4">Materialet e Ngarkuara</h4>
+
+        <div th:if="${#lists.isEmpty(materials)}" class="alert alert-info">
+            Nuk ka asnje material te ngarkuar per kete kurs akoma.
+        </div>
+
+        <div th:each="material : ${materials}" class="material-card">
+            <div class="material-info">
+                <h5>
+                    <i class="fas fa-file-pdf text-danger"></i>
+                    <span th:text="${material.originalFileName}"></span>
+                </h5>
+                <small>
+                    <span th:text="${#numbers.formatDecimal(material.fileSize / 1024.0 / 1024.0, 1, 2)} + ' MB'"></span>
+                    &bull;
+                    <span th:text="${#temporals.format(material.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                </small>
+            </div>
+            <div class="material-actions">
+                <a th:href="@{/lecturer/downloadMaterial/{courseId}/{materialId}(courseId=${course.courseId}, materialId=${material.materialId})}"
+                   class="btn btn-primary btn-sm" target="_blank">
+                    <i class="fas fa-download"></i> Shkarko
+                </a>
+                <a th:href="@{/lecturer/deleteMaterial(materialId=${material.materialId}, courseId=${course.courseId})}"
+                   class="btn btn-danger btn-sm"
+                   onclick="return confirm('Jeni te sigurt qe deshironi te fshini kete dokument?');">
+                    <i class="fas fa-trash"></i> Fshi
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a th:href="@{/lecturer/displayCourses}" class="btn btn-style btn-style-3">KTHEHU TEK KURSET</a>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{footer :: footer}">...</div>
+
+<button onclick="topFunction()" id="movetop" title="Go to top">
+    <span class="fas fa-level-up-alt" aria-hidden="true"></span>
+</button>
+<script>
+    window.onscroll = function () { scrollFunction() };
+    function scrollFunction() {
+        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            document.getElementById("movetop").style.display = "block";
+        } else {
+            document.getElementById("movetop").style.display = "none";
+        }
+    }
+    function topFunction() {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+    }
+</script>
+<script src="/assets/js/jquery-3.3.1.min.js"></script>
+<script src="/assets/js/theme-change.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+</body>
+</html>

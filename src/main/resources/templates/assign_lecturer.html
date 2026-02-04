@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Eazy School - Assign Lecturer</title>
+    <link href="//fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style-starter.css">
+    <style>
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .current-lecturer {
+            background-color: #e7f3ff;
+            border: 1px solid #b6d4fe;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div th:replace="~{header :: header}">...</div>
+
+<section class="inner-banner py-5">
+    <div class="w3l-breadcrumb py-lg-5">
+        <div class="container pt-4 pb-sm-4">
+            <h4 class="inner-text-title pt-5">Cakto Pedagogun</h4>
+            <ul class="breadcrumbs-custom-path">
+                <li><a th:href="@{/dashboard}">Dashboard</a></li>
+                <li><a th:href="@{/admin/displayCourses}">Kurset</a></li>
+                <li class="active"><i class="fas fa-angle-right"></i>Cakto Pedagog</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<div class="site-section">
+    <div class="container">
+        <!-- Error/Success Messages -->
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+        <div class="row mb-4">
+            <div class="overview-wrap">
+                <h3 class="heading-21921" th:text="'Kursi: ' + ${course.name}"></h3>
+            </div>
+        </div>
+
+        <!-- Current Lecturer -->
+        <div class="current-lecturer">
+            <h5>Pedagogu Aktual</h5>
+            <div th:if="${course.lecturer != null}">
+                <p>
+                    <strong>Emri:</strong> <span th:text="${course.lecturer.name}"></span><br/>
+                    <strong>Email:</strong> <span th:text="${course.lecturer.email}"></span><br/>
+                    <strong>Telefoni:</strong> <span th:text="${course.lecturer.mobileNumber}"></span>
+                </p>
+                <a th:href="@{/admin/removeLecturerFromCourse(courseId=${course.courseId})}"
+                   class="btn btn-danger"
+                   onclick="return confirm('Jeni te sigurt qe deshironi te hiqni pedagogun nga ky kurs?');">
+                    Hiq Pedagogun
+                </a>
+            </div>
+            <div th:if="${course.lecturer == null}">
+                <p class="text-muted">Nuk ka pedagog te caktuar per kete kurs.</p>
+            </div>
+        </div>
+
+        <!-- Assign New Lecturer -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Cakto Pedagog te Ri</h5>
+            </div>
+            <div class="card-body">
+                <div th:if="${#lists.isEmpty(lecturers)}" class="alert alert-warning">
+                    Nuk ka pedagoge te regjistruar. Ju lutem regjistroni nje pedagog nga faqja e menaxhimit te pedagogeve.
+                </div>
+
+                <form th:if="${!#lists.isEmpty(lecturers)}" th:action="@{/admin/assignLecturerToCourse}" method="post">
+                    <div class="row align-items-end">
+                        <div class="col-md-8">
+                            <label for="lecturerId" class="form-label">Zgjidhni Pedagogun</label>
+                            <select class="form-control" id="lecturerId" name="lecturerId" required>
+                                <option value="">-- Zgjidhni nje pedagog --</option>
+                                <option th:each="lecturer : ${lecturers}"
+                                        th:value="${lecturer.personId}"
+                                        th:text="${lecturer.name + ' (' + lecturer.email + ')'}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-style btn-style-3">CAKTO</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a th:href="@{/admin/displayCourses}" class="btn btn-style btn-style-3">KTHEHU TEK KURSET</a>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{footer :: footer}">...</div>
+
+<button onclick="topFunction()" id="movetop" title="Go to top">
+    <span class="fas fa-level-up-alt" aria-hidden="true"></span>
+</button>
+<script>
+    window.onscroll = function () { scrollFunction() };
+    function scrollFunction() {
+        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            document.getElementById("movetop").style.display = "block";
+        } else {
+            document.getElementById("movetop").style.display = "none";
+        }
+    }
+    function topFunction() {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+    }
+</script>
+<script src="/assets/js/jquery-3.3.1.min.js"></script>
+<script src="/assets/js/theme-change.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+</body>
+</html>

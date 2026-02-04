@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Eazy School - Course Students</title>
+    <link href="//fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style-starter.css">
+</head>
+
+<body>
+
+<div th:replace="~{header :: header}">...</div>
+
+<section class="inner-banner py-5">
+    <div class="w3l-breadcrumb py-lg-5">
+        <div class="container pt-4 pb-sm-4">
+            <h4 class="inner-text-title pt-5">Studentet e Regjistruar</h4>
+            <ul class="breadcrumbs-custom-path">
+                <li><a th:href="@{/dashboard}">Dashboard</a></li>
+                <li><a th:href="@{/lecturer/displayCourses}">Kurset e Mia</a></li>
+                <li class="active"><i class="fas fa-angle-right"></i>Studentet</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<div class="site-section">
+    <div class="table-responsive-class">
+        <div class="row mb-4">
+            <div class="overview-wrap">
+                <h3 class="heading-21921" th:text="'Studentet e regjistruar ne kursin: ' + ${course.name}"></h3>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(students)}" class="alert alert-info">
+            <p>Nuk ka studente te regjistruar ne kete kurs akoma.</p>
+        </div>
+
+        <table th:if="${!#lists.isEmpty(students)}" class="table table-striped table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Emri</th>
+                <th scope="col">Email</th>
+                <th scope="col">Numri i Telefonit</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="student, iterStat : ${students}">
+                <td th:text="${iterStat.count}"></td>
+                <td th:text="${student.name}"></td>
+                <td th:text="${student.email}"></td>
+                <td th:text="${student.mobileNumber}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <p class="text-muted" th:text="'Totali i studenteve: ' + ${students.size()}"></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2 login-center text-start mt-4">
+        <a th:href="@{/lecturer/displayCourses}">
+            <button class="btn btn-style btn-style-3 text-left">KTHEHU TEK KURSET</button>
+        </a>
+    </div>
+</div>
+
+<div th:replace="~{footer :: footer}">...</div>
+
+<button onclick="topFunction()" id="movetop" title="Go to top">
+    <span class="fas fa-level-up-alt" aria-hidden="true"></span>
+</button>
+<script>
+    window.onscroll = function () { scrollFunction() };
+    function scrollFunction() {
+        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            document.getElementById("movetop").style.display = "block";
+        } else {
+            document.getElementById("movetop").style.display = "none";
+        }
+    }
+    function topFunction() {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+    }
+</script>
+<script src="/assets/js/jquery-3.3.1.min.js"></script>
+<script src="/assets/js/theme-change.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+</body>
+</html>

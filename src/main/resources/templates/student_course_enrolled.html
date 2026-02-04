@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Eazy School - Course Details</title>
+    <link href="//fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style-starter.css">
+    <style>
+        .star-rating { display: flex; flex-direction: row-reverse; justify-content: flex-end; }
+        .star-rating input { display: none; }
+        .star-rating label { cursor: pointer; font-size: 2rem; color: #ddd; transition: color 0.2s; }
+        .star-rating label:hover, .star-rating label:hover ~ label,
+        .star-rating input:checked ~ label { color: gold; }
+        .rating-display { font-size: 1.5rem; color: gold; }
+    </style>
+</head>
+
+<body>
+
+<div th:replace="~{header :: header}">...</div>
+
+<section class="inner-banner py-5">
+    <div class="w3l-breadcrumb py-lg-5">
+        <div class="container pt-4 pb-sm-4">
+            <h4 class="inner-text-title pt-5" th:text="${course.name}">Course Name</h4>
+            <ul class="breadcrumbs-custom-path">
+                <li><a th:href="@{/home}">Home</a></li>
+                <li><a th:href="@{/courses}">Courses</a></li>
+                <li class="active"><i class="fas fa-angle-right"></i><span th:text="${course.name}">Course</span></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<div class="container py-5">
+    <!-- Success/Error Messages -->
+    <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
+
+    <!-- Enrolled Badge -->
+    <div class="alert alert-success mb-4">
+        <i class="fas fa-check-circle"></i> <strong>Jeni i regjistruar ne kete kurs!</strong>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Rating Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-star"></i> Vleresoni Kursin</h5>
+                </div>
+                <div class="card-body">
+                    <div th:if="${existingRating != null}">
+                        <p>Vleresimi juaj per kete kurs:</p>
+                        <div class="rating-display">
+                            <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                <i th:class="${i <= existingRating.rating ? 'fas fa-star' : 'far fa-star'}"></i>
+                            </span>
+                            <span class="ms-2 text-dark">(<span th:text="${existingRating.rating}">0</span>/5)</span>
+                        </div>
+                        <small class="text-muted">Vleresimi mund te behet vetem nje here.</small>
+                    </div>
+                    <div th:if="${existingRating == null}">
+                        <p>Sa do ta vleresoni kete kurs?</p>
+                        <form th:action="@{/student/rateCourse}" method="post">
+                            <input type="hidden" name="courseId" th:value="${course.courseId}">
+                            <div class="star-rating mb-3">
+                                <input type="radio" name="rating" value="5" id="star5"><label for="star5"><i class="fas fa-star"></i></label>
+                                <input type="radio" name="rating" value="4" id="star4"><label for="star4"><i class="fas fa-star"></i></label>
+                                <input type="radio" name="rating" value="3" id="star3"><label for="star3"><i class="fas fa-star"></i></label>
+                                <input type="radio" name="rating" value="2" id="star2"><label for="star2"><i class="fas fa-star"></i></label>
+                                <input type="radio" name="rating" value="1" id="star1"><label for="star1"><i class="fas fa-star"></i></label>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Dergo Vleresimin</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Image -->
+            <div class="mb-4">
+                <img th:if="${course.imagePath != null}"
+                     th:src="@{'/course-images/' + ${course.imagePath}}"
+                     alt="Course Image" class="img-fluid rounded" style="max-height: 400px; width: 100%; object-fit: cover;">
+                <img th:if="${course.imagePath == null}"
+                     src="/assets/images/c1.jpg"
+                     alt="Course Image" class="img-fluid rounded" style="max-height: 400px; width: 100%; object-fit: cover;">
+            </div>
+
+            <!-- Course Description -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Pershkrimi i Kursit</h5>
+                </div>
+                <div class="card-body">
+                    <p th:text="${course.description != null ? course.description : 'Nuk ka pershkrim te disponueshem per kete kurs.'}">
+                        Course description goes here.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Course Materials -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-file-pdf"></i> Materialet e Kursit</h5>
+                </div>
+                <div class="card-body">
+                    <div th:if="${#lists.isEmpty(materials)}">
+                        <p class="text-muted">Nuk ka materiale te ngarkuara per kete kurs.</p>
+                    </div>
+                    <div th:if="${!#lists.isEmpty(materials)}">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Dokumenti</th>
+                                        <th>Madhesia</th>
+                                        <th>Veprime</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="material : ${materials}">
+                                        <td>
+                                            <i class="fas fa-file-pdf text-danger"></i>
+                                            <span th:text="${material.originalFileName}">Document.pdf</span>
+                                        </td>
+                                        <td th:text="${#numbers.formatDecimal(material.fileSize / 1024.0 / 1024.0, 1, 2)} + ' MB'">1.5 MB</td>
+                                        <td>
+                                            <a th:href="@{'/student/downloadMaterial/' + ${course.courseId} + '/' + ${material.materialId}}"
+                                               class="btn btn-sm btn-primary">
+                                                <i class="fas fa-download"></i> Shkarko
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Course Info Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Informacione mbi Kursin</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <strong>Cmimi:</strong> <span th:text="${course.fees != null ? course.fees : 'Falas'}">Fee</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-book-open"></i>
+                            <strong>Leksione:</strong> <span th:text="${course.numLessons != null ? course.numLessons : 'N/A'}">0</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-star" style="color: gold;"></i>
+                            <strong>Vleresimi:</strong> <span th:text="${avgRating}">0.0</span>/5
+                            (<span th:text="${ratingCount}">0</span> vleresime)
+                        </li>
+                        <li class="mb-2" th:if="${course.lecturer != null}">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <strong>Pedagog:</strong> <span th:text="${course.lecturer.name}">Lecturer</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Unenroll Section -->
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0">Heq Regjistrimin</h5>
+                </div>
+                <div class="card-body">
+                    <div th:if="${hasPendingUnenrollRequest}">
+                        <div class="alert alert-info">
+                            <i class="fas fa-clock"></i> Kerkesa juaj per heqje regjistrimi eshte ne pritje per aprovim.
+                        </div>
+                    </div>
+                    <div th:if="${!hasPendingUnenrollRequest}">
+                        <p class="text-muted">Nese deshironi te hiqni regjistrimin nga ky kurs, klikoni butonin me poshte.</p>
+                        <form th:action="@{/student/requestUnenrollment}" method="post">
+                            <input type="hidden" name="courseId" th:value="${course.courseId}">
+                            <button type="submit" class="btn btn-warning w-100"
+                                    onclick="return confirm('Jeni te sigurt qe deshironi te hiqni regjistrimin nga ky kurs?')">
+                                <i class="fas fa-user-minus"></i> Kerko Heqje Regjistrimi
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a th:href="@{/courses}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Kthehu tek Kurset
+        </a>
+    </div>
+</div>
+
+<div th:replace="~{footer :: footer}">...</div>
+
+<button onclick="topFunction()" id="movetop" title="Go to top">
+    <span class="fas fa-level-up-alt" aria-hidden="true"></span>
+</button>
+<script src="/assets/js/jquery-3.3.1.min.js"></script>
+<script src="/assets/js/theme-change.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+<script>
+    window.onscroll = function() { if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) { document.getElementById("movetop").style.display = "block"; } else { document.getElementById("movetop").style.display = "none"; } };
+    function topFunction() { document.body.scrollTop = 0; document.documentElement.scrollTop = 0; }
+</script>
+</body>
+</html>

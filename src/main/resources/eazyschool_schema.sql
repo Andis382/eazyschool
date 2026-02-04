@@ -1,4 +1,4 @@
-create database eazyschool;
+CREATE DATABASE IF NOT EXISTS eazyschool;
 
 use eazyschool;
 
@@ -86,11 +86,60 @@ CREATE TABLE IF NOT EXISTS `courses` (
   `course_id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `fees` varchar(10) NOT NULL,
+  `description` varchar(600) DEFAULT NULL,
+  `image_path` varchar(255) DEFAULT NULL,
+  `num_lessons` int DEFAULT NULL,
+  `lecturer_id` int DEFAULT NULL,
   `created_at` TIMESTAMP NOT NULL,
   `created_by` varchar(50) NOT NULL,
   `updated_at` TIMESTAMP DEFAULT NULL,
   `updated_by` varchar(50) DEFAULT NULL,
-   PRIMARY KEY (`course_id`)
+   PRIMARY KEY (`course_id`),
+   FOREIGN KEY (`lecturer_id`) REFERENCES `person`(`person_id`)
+);
+
+CREATE TABLE IF NOT EXISTS `course_materials` (
+  `material_id` int NOT NULL AUTO_INCREMENT,
+  `course_id` int NOT NULL,
+  `file_name` varchar(255) NOT NULL,
+  `file_path` varchar(500) NOT NULL,
+  `created_at` TIMESTAMP NOT NULL,
+  `created_by` varchar(50) NOT NULL,
+  `updated_at` TIMESTAMP DEFAULT NULL,
+  `updated_by` varchar(50) DEFAULT NULL,
+   PRIMARY KEY (`material_id`),
+   FOREIGN KEY (`course_id`) REFERENCES `courses`(`course_id`)
+);
+
+CREATE TABLE IF NOT EXISTS `course_ratings` (
+  `rating_id` int NOT NULL AUTO_INCREMENT,
+  `course_id` int NOT NULL,
+  `student_id` int NOT NULL,
+  `rating` int NOT NULL,
+  `created_at` TIMESTAMP NOT NULL,
+  `created_by` varchar(50) NOT NULL,
+  `updated_at` TIMESTAMP DEFAULT NULL,
+  `updated_by` varchar(50) DEFAULT NULL,
+   PRIMARY KEY (`rating_id`),
+   UNIQUE KEY `unique_course_student_rating` (`course_id`, `student_id`),
+   FOREIGN KEY (`course_id`) REFERENCES `courses`(`course_id`),
+   FOREIGN KEY (`student_id`) REFERENCES `person`(`person_id`)
+);
+
+CREATE TABLE IF NOT EXISTS `course_enrollment_requests` (
+  `request_id` int NOT NULL AUTO_INCREMENT,
+  `course_id` int NOT NULL,
+  `student_id` int NOT NULL,
+  `request_type` varchar(20) NOT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'PENDING',
+  `created_at` TIMESTAMP NOT NULL,
+  `created_by` varchar(50) NOT NULL,
+  `updated_at` TIMESTAMP DEFAULT NULL,
+  `updated_by` varchar(50) DEFAULT NULL,
+   PRIMARY KEY (`request_id`),
+   UNIQUE KEY `unique_course_student_request` (`course_id`, `student_id`, `request_type`),
+   FOREIGN KEY (`course_id`) REFERENCES `courses`(`course_id`),
+   FOREIGN KEY (`student_id`) REFERENCES `person`(`person_id`)
 );
 
 CREATE TABLE IF NOT EXISTS `person_courses` (

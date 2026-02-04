@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Eazy School - Course Details</title>
+    <link href="//fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style-starter.css">
+</head>
+
+<body>
+
+<div th:replace="~{header :: header}">...</div>
+
+<section class="inner-banner py-5">
+    <div class="w3l-breadcrumb py-lg-5">
+        <div class="container pt-4 pb-sm-4">
+            <h4 class="inner-text-title pt-5" th:text="${course.name}">Course Name</h4>
+            <ul class="breadcrumbs-custom-path">
+                <li><a th:href="@{/home}">Home</a></li>
+                <li><a th:href="@{/courses}">Courses</a></li>
+                <li class="active"><i class="fas fa-angle-right"></i><span th:text="${course.name}">Course</span></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<div class="container py-5">
+    <!-- Success/Error Messages -->
+    <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Course Image -->
+            <div class="mb-4">
+                <img th:if="${course.imagePath != null}"
+                     th:src="@{'/course-images/' + ${course.imagePath}}"
+                     alt="Course Image" class="img-fluid rounded" style="max-height: 400px; width: 100%; object-fit: cover;">
+                <img th:if="${course.imagePath == null}"
+                     src="/assets/images/c1.jpg"
+                     alt="Course Image" class="img-fluid rounded" style="max-height: 400px; width: 100%; object-fit: cover;">
+            </div>
+
+            <!-- Course Description -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Pershkrimi i Kursit</h5>
+                </div>
+                <div class="card-body">
+                    <p th:text="${course.description != null ? course.description : 'Nuk ka pershkrim te disponueshem per kete kurs.'}">
+                        Course description goes here.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Course Info Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Informacione mbi Kursin</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <strong>Cmimi:</strong> <span th:text="${course.fees != null ? course.fees : 'Falas'}">Fee</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-book-open"></i>
+                            <strong>Leksione:</strong> <span th:text="${course.numLessons != null ? course.numLessons : 'N/A'}">0</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-star" style="color: gold;"></i>
+                            <strong>Vleresimi:</strong> <span th:text="${avgRating}">0.0</span>/5
+                            (<span th:text="${ratingCount}">0</span> vleresime)
+                        </li>
+                        <li class="mb-2" th:if="${course.lecturer != null}">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <strong>Pedagog:</strong> <span th:text="${course.lecturer.name}">Lecturer</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Enrollment Section -->
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Regjistrohu ne Kurs</h5>
+                </div>
+                <div class="card-body">
+                    <div th:if="${!isLoggedIn}">
+                        <p class="text-muted">Duhet te jeni te loguar per t'u regjistruar ne kete kurs.</p>
+                        <a th:href="@{/login}" class="btn btn-primary w-100">Logohu</a>
+                    </div>
+                    <div th:if="${isLoggedIn}">
+                        <div th:if="${hasPendingEnrollRequest}">
+                            <div class="alert alert-info">
+                                <i class="fas fa-clock"></i> Kerkesa juaj per regjistrim eshte ne pritje per aprovim nga administratori.
+                            </div>
+                        </div>
+                        <div th:if="${!hasPendingEnrollRequest}">
+                            <p>Deshironi te regjistroheni ne kete kurs? Kerkesa juaj do te dergothet tek administratori per aprovim.</p>
+                            <form th:action="@{/student/requestEnrollment}" method="post">
+                                <input type="hidden" name="courseId" th:value="${course.courseId}">
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="fas fa-user-plus"></i> Dergo Kerkese per Regjistrim
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a th:href="@{/courses}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Kthehu tek Kurset
+        </a>
+    </div>
+</div>
+
+<div th:replace="~{footer :: footer}">...</div>
+
+<button onclick="topFunction()" id="movetop" title="Go to top">
+    <span class="fas fa-level-up-alt" aria-hidden="true"></span>
+</button>
+<script src="/assets/js/jquery-3.3.1.min.js"></script>
+<script src="/assets/js/theme-change.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+<script>
+    window.onscroll = function() { if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) { document.getElementById("movetop").style.display = "block"; } else { document.getElementById("movetop").style.display = "none"; } };
+    function topFunction() { document.body.scrollTop = 0; document.documentElement.scrollTop = 0; }
+</script>
+</body>
+</html>

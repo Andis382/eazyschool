@@ -44,128 +44,36 @@ Author URL: http://w3layouts.com
                 <h3 class="title-style">Find The Right Course For You</h3>
             </div>
             <div class="row justify-content-center">
-                <div class="col-lg-4 col-md-6">
-                    <div class="coursecard-single">
-                        <div class="grids5-info position-relative">
-                            <img src="assets/images/c1.jpg" alt="" class="img-fluid" />
-                            <div class="meta-list">
-                                <a>Education</a>
-                            </div>
-                        </div>
-                        <div class="content-main-top">
-                            <div class="content-top mb-4 mt-3">
-                                <ul class="list-unstyled d-flex align-items-center justify-content-between">
-                                    <li> <i class="fas fa-book-open"></i> 43 Lesson</li>
-                                    <li> <i class="fas fa-star"></i> 4.9</li>
-                                </ul>
-                            </div>
-                            <h4><a>Educational Programs</a></h4>
-                            <p>Educations programmes covering core concepts of Maths,
-                                English, Science.</p>
-                        </div>
-                    </div>
+                <div th:if="${courses == null or #lists.isEmpty(courses)}" class="col-12 text-center">
+                    <p class="text-muted">Nuk ka kurse te disponueshme aktualisht.</p>
                 </div>
-                <div class="col-lg-4 col-md-6 mt-md-0 mt-4">
-                    <div class="coursecard-single">
-                        <div class="grids5-info position-relative">
-                            <img src="assets/images/c2.jpg" alt="" class="img-fluid" />
-                            <div class="meta-list">
-                                <a class="sec-2">Meditation</a>
+                <div th:each="course, iterStat : ${courses}" class="col-lg-4 col-md-6 mt-4">
+                    <a th:href="@{/student/viewCourse(id=${course.courseId})}" class="text-decoration-none">
+                        <div class="coursecard-single">
+                            <div class="grids5-info position-relative">
+                                <img th:if="${course.imagePath != null}"
+                                     th:src="@{'/course-images/' + ${course.imagePath}}"
+                                     alt="" class="img-fluid" style="height: 200px; object-fit: cover; width: 100%;" />
+                                <img th:if="${course.imagePath == null}"
+                                     th:src="@{'/assets/images/c' + ${(iterStat.index % 6) + 1} + '.jpg'}"
+                                     alt="" class="img-fluid" style="height: 200px; object-fit: cover; width: 100%;" />
+                                <div class="meta-list">
+                                    <span th:text="${course.fees != null ? course.fees : 'Free'}">Fee</span>
+                                </div>
+                            </div>
+                            <div class="content-main-top">
+                                <div class="content-top mb-4 mt-3">
+                                    <ul class="list-unstyled d-flex align-items-center justify-content-between">
+                                        <li><i class="fas fa-book-open"></i> <span th:text="${course.numLessons != null ? course.numLessons : 0}">0</span> Lesson</li>
+                                        <li><i class="fas fa-star" style="color: gold;"></i> <span th:text="${courseRatings != null and courseRatings[course.courseId] != null ? courseRatings[course.courseId] : '0.0'}">0.0</span></li>
+                                    </ul>
+                                </div>
+                                <h4 th:text="${course.name}">Course Name</h4>
+                                <p class="course-description" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
+                                   th:text="${course.description != null ? course.description : 'Nuk ka pershkrim te disponueshem.'}">Course description</p>
                             </div>
                         </div>
-                        <div class="content-main-top">
-                            <div class="content-top mb-4 mt-3">
-                                <ul class="list-unstyled d-flex align-items-center justify-content-between">
-                                    <li> <i class="fas fa-book-open"></i> 72 Lesson</li>
-                                    <li> <i class="fas fa-star"></i> 4.6</li>
-                                </ul>
-                            </div>
-                            <h4><a>Best Meditation Classes</a></h4>
-                            <p>Special program focusing the meditation to encourage students
-                                from early age.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mt-lg-0 mt-4">
-                    <div class="coursecard-single">
-                        <div class="grids5-info position-relative">
-                            <img src="assets/images/c3.jpg" alt="" class="img-fluid" />
-                            <div class="meta-list">
-                                <a class="sec-3">Games</a>
-                            </div>
-                        </div>
-                        <div class="content-main-top">
-                            <div class="content-top mb-4 mt-3">
-                                <ul class="list-unstyled d-flex align-items-center justify-content-between">
-                                    <li> <i class="fas fa-book-open"></i> 14 Lesson</li>
-                                    <li> <i class="fas fa-star"></i> 5.0</li>
-                                </ul>
-                            </div>
-                            <h4><a>Games Program in a Week</a></h4>
-                            <p> Games program encouraging the children on the physical
-                                activities.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mt-4">
-                    <div class="coursecard-single">
-                        <div class="grids5-info position-relative">
-                            <img src="assets/images/c4.jpg" alt="" class="img-fluid" />
-                            <div class="meta-list">
-                                <a href="courses.html">Development</a>
-                            </div>
-                        </div>
-                        <div class="content-main-top">
-                            <div class="content-top mb-4 mt-3">
-                                <ul class="list-unstyled d-flex align-items-center justify-content-between">
-                                    <li> <i class="fas fa-book-open"></i> 23 Lesson</li>
-                                    <li> <i class="fas fa-star"></i> 5.0</li>
-                                </ul>
-                            </div>
-                            <h4><a>Development Programs</a></h4>
-                            <p>Special development courses for special needs children to improve their confidence.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mt-4">
-                    <div class="coursecard-single">
-                        <div class="grids5-info position-relative">
-                            <img src="assets/images/c5.jpg" alt="" class="img-fluid" />
-                            <div class="meta-list">
-                                <a class="sec-2">Audio & Music</a>
-                            </div>
-                        </div>
-                        <div class="content-main-top">
-                            <div class="content-top mb-4 mt-3">
-                                <ul class="list-unstyled d-flex align-items-center justify-content-between">
-                                    <li> <i class="fas fa-book-open"></i> 40 Lesson</li>
-                                    <li> <i class="fas fa-star"></i> 4.6</li>
-                                </ul>
-                            </div>
-                            <h4><a href="courses.html">Best Music Classes</a></h4>
-                            <p>Music dedicated programmes for the music interested students.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mt-4">
-                    <div class="coursecard-single">
-                        <div class="grids5-info position-relative">
-                            <img src="assets/images/c6.jpg" alt="" class="img-fluid" />
-                            <div class="meta-list">
-                                <a class="sec-3">Art & Design</a>
-                            </div>
-                        </div>
-                        <div class="content-main-top">
-                            <div class="content-top mb-4 mt-3">
-                                <ul class="list-unstyled d-flex align-items-center justify-content-between">
-                                    <li> <i class="fas fa-book-open"></i> 20 Lesson</li>
-                                    <li> <i class="fas fa-star"></i> 4.8</li>
-                                </ul>
-                            </div>
-                            <h4><a>Painting Programs</a></h4>
-                            <p>Art & Design programmes for the children to improve their drawing skills.</p>
-                        </div>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
